@@ -1,18 +1,45 @@
-'use strict';
+"use strict";
+const AWS = require("aws-sdk");
+const db = new AWS.DynamoDB.DocumentClient();
+const uuidv4 = require("uuid/v4");
+require('dotenv').config();
 
-module.exports.hello = async event => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-    ),
+const TABLE_NAME = process.env.TABLE_NAME;
+
+module.exports.postReport = async (event, context, callback) => {
+  let item = JSON.parse(event.body);
+  item.id = uuidv4();
+  item.timestamp = new Date.now();
+
+  let params = {
+    TableName: TABLE_NAME,
+    Item: item
   };
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+  try {
+    const data = await db.put(params).promise();
+    return {
+      statusCode: 200,
+      body: JSON.stringify("report created")
+    };
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.getReports = async (event, context, callback) => {
+
+  let params = {
+    TableName: TABLE_NAME
+  };
+
+  try {
+    const data = await db.scan(params).promise();
+    return {
+      statusCode: 200,
+      body: JSON.stringify(data)
+    };
+  } catch (err) {
+    console.log(err);
+  }
 };
