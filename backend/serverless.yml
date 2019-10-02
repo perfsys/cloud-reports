@@ -26,6 +26,7 @@ functions:
       - http:
           path: reports
           method: POST
+          cors: true
 
   getReports:
     handler: handler.getReports
@@ -33,6 +34,7 @@ functions:
       - http:
           path: /reports
           method: GET
+          cors: true
 
     resources:
       Resources:

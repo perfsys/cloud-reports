@@ -9,7 +9,7 @@ const TABLE_NAME = process.env.TABLE_NAME;
 module.exports.postReport = async (event, context, callback) => {
   let item = JSON.parse(event.body);
   item.id = uuidv4();
-  item.timestamp = new Date.now();
+  item.timestamp = Date.now();
 
   let params = {
     TableName: TABLE_NAME,
