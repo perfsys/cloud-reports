@@ -2,7 +2,7 @@ service: cloud-reports
 provider:
   name: aws
   runtime: nodejs10.x
-  stage: dev
+  stage: ${opt:stage, 'dev'}
   region: eu-central-1
 
   iamRoleStatements:
@@ -10,7 +10,7 @@ provider:
       Action:
         - 'dynamodb:*'
       Resource:
-        - "arn:aws:dynamodb:eu-central-1:879430108267:table/reports"
+        - { "Fn::GetAtt": ["reportsTable", "Arn" ] }
 functions:
   # getPerson:
   #   handler: handler.getPerson
@@ -21,7 +21,7 @@ functions:
     
 
   postReport:
-    handler: handler.postReport
+    handler: index.handler
     events:
       - http:
           path: reports
@@ -29,30 +29,30 @@ functions:
           cors: true
 
   getReports:
-    handler: handler.getReports
+    handler: index.handler
     events:
       - http:
           path: /reports
           method: GET
           cors: true
 
-    resources:
-      Resources:
-        # uploadBucket:
-        #   Type: AWS::S3::Bucket
-        #   Properties:
-        #     BucketName: ${self:service}-${self:provider.stage}-uploads
+resources:
+  Resources:
+    # uploadBucket:
+    #   Type: AWS::S3::Bucket
+    #   Properties:
+    #     BucketName: ${self:service}-${self:provider.stage}-uploads
 
-        reportsTable:
-          Type: AWS::DynamoDB::Table
-          Properties:
-            TableName: reports
-            AttributeDefinitions:
-              - AttributeName: id
-                AttributeType: S
-            KeySchema:
-              - AttributeName: id
-                KeyType: HASH
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+    reportsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName:  ${self:service}-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

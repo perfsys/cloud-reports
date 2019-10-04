@@ -5,6 +5,8 @@ import store from './store'
 import Vuelidate from "vuelidate";
 import Antd from 'ant-design-vue';
 import BootstrapVue from 'bootstrap-vue';
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
 
 
 Vue.use(Vuelidate);

@@ -4,4 +4,4 @@ Deployment of the backend:
 3.	Deploy backend (sls deploy) and save url of the POST method.
 
 Deployment of the frontend:
-1.In the file "/frontend/src/components/form.vue" specify new url (in the method onSubmit).
+1.In the file “frontend/.env” specify new url.

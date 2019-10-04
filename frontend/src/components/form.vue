@@ -46,7 +46,7 @@
             <div class="form-group row">
                 <label for="example-tel-input" class="col-2 col-form-label">Network pages</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" placeholder v-model.trim="pages" @blur="$v.pages.$touch()" :class="{isInvalid: ($v.pages.$dirty && !$v.pages.required) || !$v.pages.integer}" />
+                    <input class="form-control" type="text" placeholder v-model.trim="pages" :class="{isInvalid: ($v.pages.$dirty && !$v.pages.required) || !$v.pages.integer}" />
                 </div>
             </div>
             <div class="invalidFeedback">
@@ -63,13 +63,10 @@
 
 <script>
 import { required, integer } from "vuelidate/lib/validators";
-import MaskedInput from "vue-masked-input";
 import Swal from "sweetalert2";
 import axios from "axios";
 import datetime from "vuejs-datetimepicker";
 
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
 
 export default {
     data() {
@@ -95,8 +92,7 @@ export default {
                 console.log('not send')
             } else {
                 console.log('send')
-                let url =
-                    "https://1bskfqc8fk.execute-api.eu-central-1.amazonaws.com/dev/reports";
+                let url = process.env.VUE_APP_URL;
                 let newReport = {
                     name: this.name,
                     date: this.dateTime,
@@ -111,11 +107,18 @@ export default {
                         Swal.fire({
                             position: "top-end",
                             type: "success",
-                            title: "Your form has been send",
+                            title: "Your report has been send",
                             showConfirmButton: false,
                             timer: 1500,
                             confirmButtonColor: "#23bfca"
                         });
+
+                        this.name = '';
+                        this.connections = '';
+                        this.groups = '';
+                        this.pages = '';
+                        this.dateTime = '';
+
                         console.log("OK", response);
                     })
                     .catch(error => {
@@ -124,14 +127,15 @@ export default {
             }
         }
     },
-    components: { MaskedInput, datetime }
+    components: { datetime }
 };
 </script>
 
 <style lang='scss'>
-// * {
-//   box-sizing: border-box;
-// }
+* {
+    box-sizing: border-box;
+}
+
 .container-form {
     display: flex;
     transform: translateY(25%);
