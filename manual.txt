@@ -1,7 +1,0 @@
-Deployment of the backend:
-1.	In the file “backend/serverless.yml”  specify correct name of the region and database.
-2.	In the file “backend/.env” specify correct name of the database.
-3.	Deploy backend (sls deploy) and save url of the POST method.
-
-Deployment of the frontend:
-1.In the file “frontend/.env” specify new url.

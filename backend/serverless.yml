@@ -1,9 +1,9 @@
-service: cloud-reports
+service: ${file(./config.js):config.service}
 provider:
   name: aws
   runtime: nodejs10.x
-  stage: ${opt:stage, 'dev'}
-  region: eu-central-1
+  stage: ${file(./config.js):config.stage} #${opt:stage, 'dev'}
+  region: ${file(./config.js):config.region}
 
   iamRoleStatements:
     - Effect: Allow
@@ -24,7 +24,7 @@ functions:
     handler: index.handler
     events:
       - http:
-          path: reports
+          path: /reports
           method: POST
           cors: true
 
@@ -46,7 +46,7 @@ resources:
     reportsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName:  ${self:service}-${self:provider.stage}
+        TableName: ${self:service}-${self:provider.stage}-${file(./config.js):config.tableName}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S

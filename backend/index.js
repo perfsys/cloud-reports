@@ -3,11 +3,11 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const AWS = require("aws-sdk");
 const uuidv4 = require("uuid/v4");
-require("dotenv").config();
+const config = require("./config.js").config();
 
 const app = express();
 
-const TABLE_NAME = process.env.TABLE_NAME;
+const TABLE_NAME = `${config.service}-${config.stage}-${config.tableName}`;
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json({ strict: false }));
