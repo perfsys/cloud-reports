@@ -1,25 +1,28 @@
-service: ${file(./config.js):config.service}
+service: ${self:custom.service}
+
+custom:
+  service: ${file(./config.json):service}
+  stage: ${opt:stage, '${file(./config.json):stage}'}
+  region: ${opt:region, '${file(./config.json):region}'}
+  reportsTableName: ${self:service}-${file(./config.json):reportsTableName}-${opt:stage, '${file(./config.json):stage}'}
+
 provider:
   name: aws
+  profile: perfsys
   runtime: nodejs10.x
-  stage: ${file(./config.js):config.stage} #${opt:stage, 'dev'}
-  region: ${file(./config.js):config.region}
-
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
   iamRoleStatements:
     - Effect: Allow
       Action:
         - 'dynamodb:*'
       Resource:
         - { "Fn::GetAtt": ["reportsTable", "Arn" ] }
-functions:
-  # getPerson:
-  #   handler: handler.getPerson
-  #   events:
-  #     - http:
-  #         path: persons/{id}
-  #         method: GET
-    
+  environment:
+    REPORTS_TABLE_NAME: ${self:custom.reportsTableName}
 
+
+functions:
   postReport:
     handler: index.handler
     events:
@@ -28,25 +31,20 @@ functions:
           method: POST
           cors: true
 
-  getReports:
-    handler: index.handler
-    events:
-      - http:
-          path: /reports
-          method: GET
-          cors: true
+#  getReports:
+#    handler: index.handler
+#    events:
+#      - http:
+#          path: /reports
+#          method: GET
+#          cors: true
 
 resources:
   Resources:
-    # uploadBucket:
-    #   Type: AWS::S3::Bucket
-    #   Properties:
-    #     BucketName: ${self:service}-${self:provider.stage}-uploads
-
     reportsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:service}-${self:provider.stage}-${file(./config.js):config.tableName}
+        TableName: ${self:custom.reportsTableName}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S

@@ -2,9 +2,11 @@
 node_modules
 /dist
 
+vue.config.js
+.env.production
 # local env files
-# .env.local
-# .env.*.local
+# .env.production.local
+# .env.production.*.local
 
 # Log files
 npm-debug.log*
