@@ -1,0 +1,58 @@
+service: ${file(./config.js):config.service}
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: ${file(./config.js):config.stage} #${opt:stage, 'dev'}
+  region: ${file(./config.js):config.region}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - 'dynamodb:*'
+      Resource:
+        - { "Fn::GetAtt": ["reportsTable", "Arn" ] }
+functions:
+  # getPerson:
+  #   handler: handler.getPerson
+  #   events:
+  #     - http:
+  #         path: persons/{id}
+  #         method: GET
+    
+
+  postReport:
+    handler: index.handler
+    events:
+      - http:
+          path: /reports
+          method: POST
+          cors: true
+
+  getReports:
+    handler: index.handler
+    events:
+      - http:
+          path: /reports
+          method: GET
+          cors: true
+
+resources:
+  Resources:
+    # uploadBucket:
+    #   Type: AWS::S3::Bucket
+    #   Properties:
+    #     BucketName: ${self:service}-${self:provider.stage}-uploads
+
+    reportsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-${file(./config.js):config.tableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
