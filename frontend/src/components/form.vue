@@ -80,6 +80,7 @@
     const API_ENDPOINT = process.env.VUE_APP_BASE_API_URL + '/dev';
 
     export default {
+        name: 'fields',
         data() {
             return {
                 name: "",
@@ -155,7 +156,7 @@
     }
 
     .form {
-        width: 50%;
+        width: 80%;
         border: 1px solid rgba(230, 233, 233, 0.8); // box-shadow: 3px 3px 3px 3px rgba(230, 233, 233, 0.8);
         padding: 30px;
         border-radius: 15px;

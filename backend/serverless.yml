@@ -2,9 +2,10 @@ service: ${self:custom.service}
 
 custom:
   service: ${file(./config.json):service}
-  stage: ${opt:stage, '${file(./config.json):stage}'}
+  stage: ${opt:stage, '${file(./config.json):stageTest}'}
   region: ${opt:region, '${file(./config.json):region}'}
   reportsTableName: ${self:service}-${file(./config.json):reportsTableName}-${opt:stage, '${file(./config.json):stage}'}
+  reportsTableNameReport: ${self:service}-${file(./config.json):reportsTableNameReport}-${opt:stage, '${file(./config.json):stageTest}'}
 
 provider:
   name: aws
@@ -19,7 +20,8 @@ provider:
       Resource:
         - { "Fn::GetAtt": ["reportsTable", "Arn" ] }
   environment:
-    REPORTS_TABLE_NAME: ${self:custom.reportsTableName}
+    REPORTS_TABLE_NAME_REPORT: ${self:custom.reportsTableNameReport}
+#    REPORTS_TABLE_NAME: ${self:custom.reportsTableName}
 
 
 functions:
@@ -27,7 +29,15 @@ functions:
     handler: index.handler
     events:
       - http:
-          path: /reports
+          path: '/reports'
+          method: POST
+          cors: true
+
+  postUserReport:
+    handler: index.handler
+    events:
+      - http:
+          path: '/reports/user-report'
           method: POST
           cors: true
 
@@ -44,7 +54,7 @@ resources:
     reportsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.reportsTableName}
+        TableName: ${self:custom.reportsTableNameReport}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S

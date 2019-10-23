@@ -2,5 +2,7 @@
     "service": "cloud-reports",
     "region": "us-east-1",
     "stage": "dev",
-    "reportsTableName": "reports"
+    "stageTest": "test",
+    "reportsTableName": "reports",
+    "reportsTableNameReport": "user-reports"
 }
