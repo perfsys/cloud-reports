@@ -1,0 +1,100 @@
+[
+    {
+        "id": "0",
+        "name": "customer 1",
+        "projects": [
+            {
+                "name": "project 11"
+            },
+            {
+                "name": "project 12"
+            }
+
+        ],
+        "boardId": "5d677eaf44d4ef65fa327b3c"
+    },
+    {
+        "id": "1",
+        "name": "customer 2",
+        "projects": [
+            {
+                "name": "project 21"
+            },
+            {
+                "name": "project 22"
+            }
+
+        ],
+        "boardId": "5d677eaf44d4ef65fa327b3c"
+    },
+    {
+        "id": "2",
+        "name": "customer 3",
+        "projects": [
+            {
+                "name": "project 31"
+            },
+            {
+                "name": "project 32"
+            }
+
+        ],
+        "boardId": "5d677eaf44d4ef65fa327b3c"
+    },
+    {
+        "id": "3",
+        "name": "customer 4",
+        "projects": [
+            {
+                "name": "project 41"
+            },
+            {
+                "name": "project 42"
+            }
+
+        ],
+        "boardId": "5d679771cf4bab6b270a0a26"
+    },
+    {
+        "id": "4",
+        "name": "customer 5",
+        "projects": [
+            {
+                "name": "project 51"
+            },
+            {
+                "name": "project 52"
+            }
+
+        ],
+        "boardId": "5d679771cf4bab6b270a0a26"
+    },
+    {
+        "id": "5",
+        "name": "customer 6",
+        "projects": [
+            {
+                "name": "project 61"
+            },
+            {
+                "name": "project 62"
+            }
+
+        ],
+        "boardId": "5d679771cf4bab6b270a0a26"
+    },
+    {
+        "id": "6",
+        "name": "customer 7",
+        "projects": [
+            {
+                "name": "project 71"
+            },
+            {
+                "name": "project 72"
+            }
+
+        ],
+        "boardId": "5d679771cf4bab6b270a0a26"
+    }
+]
