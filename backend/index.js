@@ -1,40 +1,24 @@
 const serverless = require("serverless-http");
 const bodyParser = require("body-parser");
 const express = require("express");
-const AWS = require("aws-sdk");
-const uuidv4 = require("uuid/v4");
-const config = require("./config.js").config();
+const reports = require("./functions/reports");
+const trello = require("./functions/trello");
+const cors = require("cors");
 
 const app = express();
 
-const TABLE_NAME = `${config.service}-${config.stage}-${config.tableName}`;
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
-
+app.use(cors());
 app.use(bodyParser.json({ strict: false }));
 
+app.use("/reports", reports);
+app.use("/trello", trello);
+
 app.get("/", function(req, res) {
-  res.send("Hello World!");
+  res.send("HEALTHY");
 });
 
-//Create report
-app.post("/reports", function(req, res) {
-  const item = req.body;
-
-  item.id = uuidv4();
-  item.timestamp = Date.now();
-
-  const params = {
-    TableName: TABLE_NAME,
-    Item: item
-  };
-
-  dynamoDb.put(params, error => {
-    if (error) {
-      console.log(error);
-      res.status(400).json({ error: "Could not create report" });
-    }
-    res.json({ response: "Create new report" });
-  });
+module.exports.handler = serverless(app, {
+  request: function(req, event, context) {
+    req.context = event.requestContext;
+  }
 });
-
-module.exports.handler = serverless(app);
