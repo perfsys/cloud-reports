@@ -1,0 +1,118 @@
+service: ${self:custom.service}
+
+custom:
+  service: ${file(./config.json):service}
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, '${file(./config.json):region}'}
+  leadGenerationReportTable: ${self:service}-leadGenerationReport-${self:custom.stage}
+  developerWeeklyReportTable: ${self:service}-developerWeeklyReport-${self:custom.stage}
+
+provider:
+  name: aws
+  profile: perfsys
+  runtime: nodejs10.x
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - { "Fn::GetAtt": ["leadGenerationReportTable", "Arn" ] }
+        - { "Fn::GetAtt": ["developerWeeklyReportTable", "Arn" ] }
+  environment:
+    LEAD_GENERATION_REPORT_TABLE_NAME: ${self:custom.leadGenerationReportTable}
+    DEVELOPER_WEEKLY_REPORT_TABLE_NAME: ${self:custom.developerWeeklyReportTable}
+
+package:
+  exclude:
+#    - layerSourceTarball.tar.gz
+#    - layer/**
+    - frontend/**
+
+#layers:
+#  nodeModules:
+#    path: layer/nodejs/node_modules
+#    name: ${self:service}-node-modules-${opt:stage, self:provider.stage}
+#    description: "Shared node modules"
+#    compatibleRuntimes:
+#      - nodejs10.x
+
+
+functions:
+  index:
+    handler: index.handler
+#    layers:
+#      - {Ref: NodeModulesLambdaLayer}
+    events:
+      - http:
+          path: /
+          method: GET
+
+  health:
+    handler: index.handler
+#    layers:
+#      - {Ref: NodeModulesLambdaLayer}
+    events:
+      - http:
+          path: /health
+          method: GET
+          cors: true
+
+  saveLeadGenerationReport:
+    handler: index.handler
+#    layers:
+#      - {Ref: NodeModulesLambdaLayer}
+    events:
+      - http:
+          path: /report/lead-generation
+          method: POST
+          cors: true
+
+  saveDeveloperWeeklyReport:
+    handler: index.handler
+#    layers:
+#      - {Ref: NodeModulesLambdaLayer}
+    events:
+      - http:
+          path: /report/developer-weekly
+          method: POST
+          cors: true
+
+  getInfoFromTrello:
+    handler: index.handler
+#    layers:
+#      - {Ref: NodeModulesLambdaLayer}
+    events:
+      - http:
+          path: /trello/{id}
+          method: GET
+          cors: true
+
+resources:
+  Resources:
+    leadGenerationReportTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.leadGenerationReportTable}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+    developerWeeklyReportTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.developerWeeklyReportTable}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH

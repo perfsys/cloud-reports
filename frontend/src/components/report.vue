@@ -55,6 +55,8 @@ import dayReport from "./dayReport.vue";
 import qs from "querystring";
 import Swal from "sweetalert2";
 
+const API_ENDPOINT = `${document.location.protocol}//${document.location.hostname}/dev`;
+
 export default {
     name: "report",
     data: () => {
@@ -97,7 +99,7 @@ export default {
 
             axios
                 .post(
-                    "https://o814u8lpp8.execute-api.us-east-1.amazonaws.com/test/reports/user-report",
+                    API_ENDPOINT  + '/report/developer-weekly',
                     request
                 )
                 .then(response => {

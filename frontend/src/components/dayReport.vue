@@ -68,6 +68,8 @@ import usersDb from "../db/users.json";
 import projectsDb from "../db/projects.json";
 import customersDb from "../db/customers.json";
 
+const API_ENDPOINT = `${document.location.protocol}//${document.location.hostname}/dev`;
+
 export default {
   name: "dayReport",
   props: ["info"],
@@ -115,7 +117,7 @@ export default {
     },
 
     async setTask(index, idx) {
-      let url = `https://o814u8lpp8.execute-api.us-east-1.amazonaws.com/test/trello/${this.customersDb[index].boardId}`;
+      let url = `${API_ENDPOINT}/trello/${this.customersDb[index].boardId}`;
       let result;
 
       await axios

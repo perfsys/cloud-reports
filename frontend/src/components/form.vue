@@ -77,7 +77,8 @@
     import axios from "axios";
     import datetime from "vuejs-datetimepicker";
 
-    const API_ENDPOINT = process.env.VUE_APP_BASE_API_URL + '/dev';
+    // const API_ENDPOINT = process.env.VUE_APP_BASE_API_URL + '/dev';
+    const API_ENDPOINT = `${document.location.protocol}//${document.location.hostname}/dev`;
 
     export default {
         name: 'fields',
@@ -113,7 +114,7 @@
                     console.log(API_ENDPOINT);
                     console.log("send newReport", newReport);
                     axios
-                        .post(API_ENDPOINT + '/reports', newReport)
+                        .post(`${API_ENDPOINT}/report/lead-generation`, newReport)
                         .then(response => {
                             Swal.fire({
                                 position: "top-end",

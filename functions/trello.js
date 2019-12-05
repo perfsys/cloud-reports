@@ -1,12 +1,11 @@
-const AWS = require("aws-sdk");
 const express = require("express");
 const router = express.Router();
 require("dotenv").config();
 
-var apiKey = process.env.TRELLO_API_KEY;
-var oauthToken = process.env.TRELLO_OAUTH_TOKEN;
+const apiKey = process.env.TRELLO_API_KEY;
+const oauthToken = process.env.TRELLO_OAUTH_TOKEN;
 
-var trello = require("trello-node-api")(apiKey, oauthToken);
+const trello = require("trello-node-api")(apiKey, oauthToken);
 
 router.get("/:id", async (req, res) => {
   const boardId = req.params.id;
