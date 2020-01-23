@@ -10,7 +10,6 @@ custom:
 
 provider:
   name: aws
-  profile: perfsys
   runtime: nodejs10.x
   stage: ${self:custom.stage}
   region: ${self:custom.region}
