@@ -9,6 +9,7 @@ phases:
       - npm install
 
       - pip install --upgrade awscli
+      - npm i -g serverless
 
   build:
     commands:
@@ -17,7 +18,7 @@ phases:
       - aws s3 cp --recursive dist/ s3://$WEBSITE_S3_BUCKET_NAME/public/ --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
       - sed -i -e "s|/assets/|https://$CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME/public/assets/|g" dist/index.html
 
-      - sls deploy -v
+      - sls deploy -s $STAGE -v
 
 artifacts:
   type: zip
