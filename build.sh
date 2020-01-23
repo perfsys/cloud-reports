@@ -2,7 +2,7 @@
 
 npm run build --prefix ./frontend
 
-export AWS_PROFILE=perfsys
+#export AWS_PROFILE=perfsys
 
 export WEBSITE_S3_BUCKET=aws-website-cloud-reports-dev-temp
 export WEBSITE_S3_BUCKET_PREFIX=https://$WEBSITE_S3_BUCKET.s3.eu-central-1.amazonaws.com

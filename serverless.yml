@@ -1,9 +1,10 @@
-service: ${self:custom.service}
+# github
+service: perfsys-cloud-reports
 
 custom:
-  service: ${file(./config.json):service}
+  service: ${self:service}
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, '${file(./config.json):region}'}
+  region: ${opt:region, 'eu-west-1'}
   leadGenerationReportTable: ${self:service}-leadGenerationReport-${self:custom.stage}
   developerWeeklyReportTable: ${self:service}-developerWeeklyReport-${self:custom.stage}
 

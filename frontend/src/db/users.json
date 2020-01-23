@@ -1,23 +1,26 @@
 [
     {
-        "name": "user 1"
+        "name": "Eugene Orlovsky",
+        "username": "erlovsky"
     },
     {
-        "name": "user 2"
+        "name": "Pavlo Kozub",
+        "username": "pkozub"
     },
     {
-        "name": "user 3"
+        "name": "Elena Vasilkovich",
+        "username": "evasilkovich"
     },
     {
-        "name": "user 4"
+        "name": "Andrei Kupcov",
+        "username": "akupcov"
     },
     {
-        "name": "user 5"
+        "name": "Svetlana Tovt",
+        "username": "stovt"
     },
     {
-        "name": "user 6"
-    },
-    {
-        "name": "user 7"
+        "name": "Alex Soldatov",
+        "username": "asoldatov"
     }
 ]

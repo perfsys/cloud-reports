@@ -29,11 +29,15 @@ router.post("/lead-generation", (req, res) => {
 
 //Save developer-weekly report
 router.post("/developer-weekly", async (req, res) => {
-    const body = req.body;
-    console.log(`Body: ${body}`);
+    const {body} = req;
+    console.log(`Body: ${JSON.stringify(body, null, 4)}`);
+
+    if (body.tasks.length === 0) {
+        res.status(400).json({error: "Could not find the tasks"});
+    }
     let params = {
         RequestItems: {
-            [DEVELOPER_WEEKLY_REPORT_TABLE_NAME]: createItem(body, body.report)
+            [DEVELOPER_WEEKLY_REPORT_TABLE_NAME]: createItems(body)
         }
     };
 
@@ -42,15 +46,15 @@ router.post("/developer-weekly", async (req, res) => {
     await dynamoDb.batchWrite(params, (err, data) => {
         if (err) {
             console.log(err);
-            res.status(400).json({error: "Could not create report"});
+            res.status(400).json({error: "Tasks is empty."});
         }
         res.json({response: "New report created"});
     });
 });
 
-createItem = (item, array) => {
-    console.log("Start createItem");
-    return array.map(el => {
+let createItems = (item) => {
+    console.log("Start createItems");
+    return item.tasks.map(el => {
         let result = {
             PutRequest: {
                 Item: {
@@ -58,16 +62,17 @@ createItem = (item, array) => {
                     timestamp: Date.now(),
                     user: item.user,
                     week: item.week,
-                    day: el.date,
-                    taskId: el.taskId,
-                    taskLink: el.taskLink,
-                    project: el.project,
                     customer: el.customer,
-                    hours: el.hours
+                    hours: el.hours,
+                    project: el.project,
+                    date: el.date,
+                    taskId: el.taskId,
+                    boardId: el.boardId,
+                    listId: el.listId
                 }
             }
         };
-        console.log(`Result: ${result}`);
+        console.log(`Result: ${JSON.stringify(result, null, 4)}`);
         return result
     });
 
