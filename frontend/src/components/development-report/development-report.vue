@@ -126,7 +126,7 @@
                         };
 
                         axios
-                            .post(`${this.API_ENDPOINT}/report/developer-weekly`, request)
+                            .post(`/dev/report/developer-weekly`, request)
                             .then(() => {
                                 Swal.fire({
                                     position: 'top-end',

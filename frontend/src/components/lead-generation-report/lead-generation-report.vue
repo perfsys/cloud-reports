@@ -114,7 +114,7 @@
                     console.log(API_ENDPOINT);
                     console.log("send newReport", newReport);
                     axios
-                        .post(`${API_ENDPOINT}/report/lead-generation`, newReport)
+                        .post(`/dev/report/lead-generation`, newReport)
                         .then(response => {
                             Swal.fire({
                                 position: "top-end",

@@ -80,6 +80,9 @@ functions:
 
   getInfoFromTrello:
     handler: index.handler
+    environment:
+      TRELLO_API_KEY: ${env:TRELLO_API_KEY}
+      TRELLO_OAUTH_TOKEN: ${env:TRELLO_OAUTH_TOKEN}
 #    layers:
 #      - {Ref: NodeModulesLambdaLayer}
     events:
