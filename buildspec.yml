@@ -14,7 +14,7 @@ phases:
     commands:
       - npm run build --prefix ./frontend
 
-      - aws s3 cp --recursive dist/ s3://WEBSITE_S3_BUCKET_NAME/public/ --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+      - aws s3 cp --recursive dist/ s3://$WEBSITE_S3_BUCKET_NAME/public/ --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
       - sed -i -e "s|/assets/|https://$CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME/public/assets/|g" dist/index.html
 
       - sls deploy -v
