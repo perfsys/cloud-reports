@@ -1,6 +1,11 @@
 service: perfsys-cloud-reports
 
+plugins:
+  - serverless-domain-manager
+
 custom:
+  customDomain:
+    domainName: reports-${opt:stage, 'dev'}.perfsys.io
   service: ${self:service}
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
