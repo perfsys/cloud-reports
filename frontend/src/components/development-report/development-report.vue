@@ -126,7 +126,7 @@
                         };
 
                         axios
-                            .post(`/dev/report/developer-weekly`, request)
+                            .post(`/report/developer-weekly`, request)
                             .then(() => {
                                 Swal.fire({
                                     position: 'top-end',

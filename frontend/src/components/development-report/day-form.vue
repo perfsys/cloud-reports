@@ -122,7 +122,7 @@
 
             async selectProject(event, index) {
                 // let url = `${this.API_ENDPOINT}/trello/${event.target.value}`;
-                let url = `/dev/trello/${event.target.value}`;
+                let url = `/trello/${event.target.value}`;
                 let result;
                 let me = this;
 
