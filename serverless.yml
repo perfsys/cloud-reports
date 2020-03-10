@@ -91,6 +91,14 @@ functions:
           method: POST
           cors: true
 
+  deleteDeveloperAtomicReport:
+    handler: index.handler
+    events:
+      - http:
+          path: /report/developer/job
+          method: DELETE
+          cors: true
+          
   getInfoFromTrello:
     handler: index.handler
     environment:

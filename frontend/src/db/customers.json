@@ -5,7 +5,7 @@
     "projects": [
       {
         "id": "5d677eaf44d4ef65fa327b3c",
-        "name": "cloud-projects"
+        "name": "Cloud projects"
       },
       {
         "id": "5b2cf2ecef476c0dff2521c3",
@@ -25,6 +25,26 @@
   },
   {
     "id": 2,
+    "name": "oversecured",
+    "projects": [
+      {
+        "id": "5e30392ce1e70f452abebeab",
+        "name": "Oversecured"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "digscloud",
+    "projects": [
+      {
+        "id": "5ccfff23adc6aa5ce666dab9",
+        "name": "Digs.Cloud"
+      }
+    ]
+  },
+  {
+    "id": 4,
     "name": "xena",
     "projects": [
       {
@@ -34,7 +54,7 @@
     ]
   },
   {
-    "id": 3,
+    "id": 5,
     "name": "metal-expert",
     "projects": [
       {

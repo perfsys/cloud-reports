@@ -88,4 +88,22 @@ router.post("/day", async (req, res) => {
     });
 });
 
+router.delete("/job", async (req, res) => {
+    console.log(`Body: ${JSON.stringify(req.body, null, 4)}`);
+    const { user, id } = req.body;
+
+
+    const params = {
+        TableName: DEVELOPER_WEEKLY_REPORT_TABLE_NAME,
+        Key: {
+            user: user,
+            id: id
+        }
+    };
+    await dynamoDb.delete(params).promise();
+
+    res.json({ status: 'deleted' });
+
+});
+
 module.exports = router;

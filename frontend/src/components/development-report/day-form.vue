@@ -4,10 +4,17 @@
             <b-badge variant="primary" class="day-badge">{{ day.date }}</b-badge>
 
             <div class="container-report-form">
-                <b-table v-if="dailyReport && dailyReport.length > 0" striped hover :fields="fields" :items="dailyReport">
+                <b-table v-if="dailyReport && dailyReport.length > 0" striped hover :fields="fields"
+                         :items="dailyReport">
                     <template v-slot:cell(shortUrl)="data">
-
-                        <button type="button" @click="openTrelloTask(data.item.shortUrl)" class="btn btn-primary">{{ data.item.name }}</button>
+                        <button type="button" @click="openTrelloTask(data.item.shortUrl)" class="btn btn-primary">{{
+                            data.item.name }}
+                        </button>
+                    </template>
+                    <template v-slot:cell(action)="data">
+                        <b-button variant="danger" @click="deleteJob(data.item.id)">
+                            <font-awesome-icon icon="minus"/>
+                        </b-button>
                     </template>
                 </b-table>
 
@@ -92,10 +99,11 @@
         data: () => {
             return {
                 fields: [
-                    { key: 'customer', label: 'Customer' },
-                    { key: 'project', label: 'Project' },
-                    { key: 'shortUrl', label: 'Task' },
-                    { key: 'hours', label: 'Hours' }
+                    {key: 'customer', label: 'Customer'},
+                    {key: 'project', label: 'Project'},
+                    {key: 'shortUrl', label: 'Task'},
+                    {key: 'hours', label: 'Hours'},
+                    'action'
                 ],
                 usersDb: usersDb,
                 customersDb: customersDb,
@@ -172,6 +180,25 @@
                 // this.dayReport[index].taskLink = event.target.value.url;
                 this.initSaveForm()
             },
+            deleteJob(id) {
+                this.axios
+                    .delete(`/report/developer/job`, {data: {user: this.user, id: id}})
+                    .then(() => {
+                        Swal.fire({
+                            position: 'top-end',
+                            title: 'The report was deleted',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        this.fetchDay()
+                    })
+                    .catch(error => {
+                        this.$log.error(error)
+                        Swal.fire({
+                            text: "Something went wrong!",
+                        });
+                    });
+            },
             getProjectList() {
                 let customerName = this.tmpJob.customer;
                 let projects = {};
@@ -186,7 +213,7 @@
                 return projects;
             },
             getProjectById(id) {
-                return  this.getProjectList().find(project => project.id === id);
+                return this.getProjectList().find(project => project.id === id);
             },
             selectCustomer() {
                 this.clearProjectsDropdown()
@@ -248,7 +275,7 @@
                 this.tmpJob.hours = 0
                 this.tmpJob.form.hoursEnable = false
             },
-            openTrelloTask(url){
+            openTrelloTask(url) {
                 console.log(url)
                 window.open(url, '_blank')
             }
