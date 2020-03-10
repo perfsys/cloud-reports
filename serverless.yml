@@ -116,13 +116,13 @@ resources:
         TableName: ${self:custom.developerWeeklyReportTable}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
           - AttributeName: user
+            AttributeType: S
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: id
-            KeyType: RANGE
           - AttributeName: user
             KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
 
