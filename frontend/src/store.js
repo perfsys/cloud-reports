@@ -2,24 +2,71 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-
+const weekInit = {
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+    7: []
+}
 export default new Vuex.Store({
     state: {
-        mon: [],
-        tue: [],
-        wed: [],
-        thu: [],
-        fri: [],
-        sat: [],
-        sun: []
+        week: {
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+            6: [],
+            7: []
+        }
     },
-    mutations: {},
+    mutations: {
+        setJob(state, job) {
+            state.week[job.day].push(job)
+        },
+        clearWeek(state) {
+            state.week = {
+                1: [],
+                2: [],
+                3: [],
+                4: [],
+                5: [],
+                6: [],
+                7: []
+            }
+        },
+        clearDay(state, day) {
+            state.week[day] = []
+        }
+    },
     actions: {
-      async fetchWeek({commit}, data) {
-        const response = await Vue.axios.post('/report/developer/week', data)
-        console.log(response)
-        // commit('setJobs', data)
-        // commit('clearCurrentJob')
-      },
+        async fetchWeek({commit}, params) {
+            commit('clearWeek')
+            const {data} = await Vue.axios.post('/report/developer/week', params)
+            data.week
+                .map(job => {
+                    job.day = new Date(new Date(job.date).toLocaleDateString()).getDay();
+                    return job
+                })
+                .forEach(job => commit('setJob', job))
+
+        },
+        async fetchDay({commit}, params) {
+            const day = new Date(new Date(params.date).toLocaleDateString()).getDay()
+            commit('clearDay', day)
+            const {data} = await Vue.axios.post('/report/developer/day', params)
+            data.day
+                .map(job => {
+                    job.day = new Date(new Date(job.date).toLocaleDateString()).getDay();
+                    return job
+                })
+                .forEach(job => commit('setJob', job))
+        },
+    },
+    getters: {
+        week: s => s.week
     }
 })

@@ -75,6 +75,14 @@ functions:
           method: POST
           cors: true
 
+  getDeveloperDailyReport:
+    handler: index.handler
+    events:
+      - http:
+          path: /report/developer/day
+          method: POST
+          cors: true
+
   saveDeveloperAtomicReport:
     handler: index.handler
     events:

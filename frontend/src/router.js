@@ -9,7 +9,7 @@ import test from './components/test';
 Vue.use(Router);
 
 const routes = [
-    {path: '/', redirect: '/marketing'},
+    {path: '/', redirect: '/development'},
     {
         path: '/marketing',
         name: 'Marketing',

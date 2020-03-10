@@ -30,9 +30,10 @@
             <dayReport
                     v-for="(day, index) in fullWeek"
                     v-bind:key="index"
-                    :day_info="{ date: day, id: index }"
+                    :dayInfo="{ date: day, id: index }"
                     :user="user"
                     :week="currentWeek"
+                    :dailyReport="weeklyReport[index + 1]"
             >
             </dayReport>
         </div>
@@ -40,6 +41,7 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
     import usersDb from "../../db/users.json";
     import dayForm from "./day-form.vue";
 
@@ -70,7 +72,10 @@
             },
             isNextWeekPointerEnabled() {
                 return this.currentWeek < 53;
-            }
+            },
+            ...mapGetters({
+                weeklyReport: 'week'
+            })
         },
         components: {
             dayReport: dayForm
@@ -81,12 +86,15 @@
             }
         },
         methods: {
+            async fetchWeek(){
+                await this.$store.dispatch('fetchWeek', {
+                    user: this.user,
+                    week: this.currentWeek
+                })
+            },
             async selectUser(){
                 if (this.user !== "") {
-                    await this.$store.dispatch('fetchWeek', {
-                        user: this.user,
-                        week: this.currentWeek
-                    })
+                    this.fetchWeek()
                     this.weekEnable = true
                 }
             },
@@ -97,6 +105,9 @@
                 return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
             },
             setWeek() {
+                if (this.user !== "") {
+                    this.fetchWeek()
+                }
                 let year = new Date().getFullYear();
                 let weekNumber = this.currentWeek;
                 let weekDay = 1;

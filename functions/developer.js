@@ -21,7 +21,9 @@ router.post("/job", async (req, res) => {
         date: body.date,
         taskId: body.taskId,
         boardId: body.boardId,
-        listId: body.listId
+        listId: body.listId,
+        shortUrl: body.shortUrl,
+        name: body.name
     }
     console.log(`Item: ${item}`);
     const params = {
@@ -46,11 +48,8 @@ router.post("/week", async (req, res) => {
 
     const params = {
         TableName: DEVELOPER_WEEKLY_REPORT_TABLE_NAME,
-        // Key: {
-        //     user: body.user,
-        //     week: body.week
-        // },
-        KeyConditionExpression: '#user = :user and #week = :week',
+        KeyConditionExpression: '#user = :user',
+        FilterExpression: '#week = :week',
         ExpressionAttributeNames: {"#user": "user", "#week": "week"},
         ExpressionAttributeValues: {":user": body.user, ":week": body.week}
     };
@@ -62,35 +61,31 @@ router.post("/week", async (req, res) => {
             console.log(err);
             res.status(400).json({error: "Tasks is empty."});
         }
-        res.json({week: data});
+        res.json({week: data.Items});
     });
 });
 
+router.post("/day", async (req, res) => {
+    const {body} = req;
+    console.log(`Body: ${JSON.stringify(body, null, 4)}`);
 
-let createItems = (item) => {
-    console.log("Start createItems");
-    return item.tasks.map(el => {
-        let result = {
-            PutRequest: {
-                Item: {
-                    id: uuidv4(),
-                    timestamp: Date.now(),
-                    user: item.user,
-                    week: item.week,
-                    customer: el.customer,
-                    hours: el.hours,
-                    project: el.project,
-                    date: el.date,
-                    taskId: el.taskId,
-                    boardId: el.boardId,
-                    listId: el.listId
-                }
-            }
-        };
-        console.log(`Result: ${JSON.stringify(result, null, 4)}`);
-        return result
+    const params = {
+        TableName: DEVELOPER_WEEKLY_REPORT_TABLE_NAME,
+        KeyConditionExpression: '#user = :user',
+        FilterExpression: '#date = :date',
+        ExpressionAttributeNames: {"#user": "user", "#date": "date"},
+        ExpressionAttributeValues: {":user": body.user, ":date": body.date}
+    };
+
+    console.log(`Params: ${JSON.stringify(params, null, 4)}`);
+
+    dynamoDb.query(params, (err, data) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({error: "Tasks is empty."});
+        }
+        res.json({day: data.Items});
     });
-
-};
+});
 
 module.exports = router;

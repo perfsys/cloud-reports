@@ -2,7 +2,16 @@
     <div>
         <div>
             <b-badge variant="primary" class="day-badge">{{ day.date }}</b-badge>
+
             <div class="container-report-form">
+                <b-table v-if="dailyReport && dailyReport.length > 0" striped hover :fields="fields" :items="dailyReport">
+                    <template v-slot:cell(shortUrl)="data">
+
+                        <button type="button" @click="openTrelloTask(data.item.shortUrl)" class="btn btn-primary">{{ data.item.name }}</button>
+                    </template>
+                </b-table>
+
+
                 <div class="container-report">
                     <div class="position-input">
                         <select class="form-control"
@@ -79,14 +88,20 @@
 
     export default {
         name: "dayReport",
-        props: ["day_info", "user", "week"],
+        props: ["dayInfo", "user", "week", "dailyReport"],
         data: () => {
             return {
+                fields: [
+                    { key: 'customer', label: 'Customer' },
+                    { key: 'project', label: 'Project' },
+                    { key: 'shortUrl', label: 'Task' },
+                    { key: 'hours', label: 'Hours' }
+                ],
                 usersDb: usersDb,
                 customersDb: customersDb,
                 day: {},
-                user: null,
-                week: null,
+                // user: null,
+                // week: null,
                 tmpJob: {
                     form: {
                         taskEnable: false,
@@ -101,16 +116,16 @@
             };
         },
         async beforeMount() {
-            this.day = this.day_info;
-            await this.$store.dispatch('jobs/fetchJobs', {
-                user: this.user,
-                date: this.day.date
-            })
+            this.day = this.dayInfo;
         },
         methods: {
+            async fetchDay() {
+                await this.$store.dispatch('fetchDay', {
+                    user: this.user,
+                    date: this.day.date
+                })
+            },
             saveJob() {
-
-
                 if (this.user !== "") {
 
                     let request = {
@@ -125,7 +140,9 @@
 
                         taskId: this.tmpJob.task.id,
                         boardId: this.tmpJob.task.idBoard,
-                        listId: this.tmpJob.task.idList
+                        listId: this.tmpJob.task.idList,
+                        shortUrl: this.tmpJob.task.shortUrl,
+                        name: this.tmpJob.task.name
                     };
                     this.$log.info(this.request)
                     this.axios
@@ -137,6 +154,7 @@
                                 showConfirmButton: false,
                                 timer: 1500
                             })
+                            this.fetchDay()
                         })
                         .catch(error => {
                             this.$log.error(error)
@@ -229,6 +247,10 @@
             clearHoursInput() {
                 this.tmpJob.hours = 0
                 this.tmpJob.form.hoursEnable = false
+            },
+            openTrelloTask(url){
+                console.log(url)
+                window.open(url, '_blank')
             }
         }
     };
