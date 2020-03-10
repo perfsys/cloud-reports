@@ -13,7 +13,7 @@
 
   let API_ENDPOINT = '';
   if (document.location.hostname === 'localhost') {
-    API_ENDPOINT = 'https://1ith9lnkc2.execute-api.eu-west-1.amazonaws.com/dev\n'
+    API_ENDPOINT = 'https://1ith9lnkc2.execute-api.eu-west-1.amazonaws.com/dev'
   } else {
     API_ENDPOINT = `${document.location.protocol}/${document.location.hostname}/dev`
   }

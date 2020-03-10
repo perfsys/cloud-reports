@@ -2,6 +2,8 @@ service: perfsys-cloud-reports
 
 plugins:
   - serverless-domain-manager
+  - serverless-offline
+  - serverless-dotenv-plugin
 
 custom:
   customDomain:
@@ -30,8 +32,6 @@ provider:
 
 package:
   exclude:
-#    - layerSourceTarball.tar.gz
-    - layer/**
     - frontend/**
 
 #layers:
@@ -46,8 +46,6 @@ package:
 functions:
   index:
     handler: index.handler
-#    layers:
-#      - {Ref: NodeModulesLambdaLayer}
     events:
       - http:
           path: /
@@ -55,8 +53,6 @@ functions:
 
   health:
     handler: index.handler
-#    layers:
-#      - {Ref: NodeModulesLambdaLayer}
     events:
       - http:
           path: /health
@@ -65,21 +61,25 @@ functions:
 
   saveLeadGenerationReport:
     handler: index.handler
-#    layers:
-#      - {Ref: NodeModulesLambdaLayer}
     events:
       - http:
           path: /report/lead-generation
           method: POST
           cors: true
 
-  saveDeveloperWeeklyReport:
+  getDeveloperWeeklyReport:
     handler: index.handler
-#    layers:
-#      - {Ref: NodeModulesLambdaLayer}
     events:
       - http:
-          path: /report/developer-weekly
+          path: /report/developer/week
+          method: POST
+          cors: true
+
+  saveDeveloperAtomicReport:
+    handler: index.handler
+    events:
+      - http:
+          path: /report/developer/job
           method: POST
           cors: true
 
@@ -88,11 +88,9 @@ functions:
     environment:
       TRELLO_API_KEY: ${env:TRELLO_API_KEY}
       TRELLO_OAUTH_TOKEN: ${env:TRELLO_OAUTH_TOKEN}
-#    layers:
-#      - {Ref: NodeModulesLambdaLayer}
     events:
       - http:
-          path: /trello/{id}
+          path: /trello
           method: GET
           cors: true
 
@@ -120,6 +118,11 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+          - AttributeName: user
+            AttributeType: S
         KeySchema:
           - AttributeName: id
+            KeyType: RANGE
+          - AttributeName: user
             KeyType: HASH
+

@@ -3,18 +3,29 @@ const AWS = require("aws-sdk");
 const uuidv4 = require("uuid/v4");
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
-const LEAD_GENERATION_REPORT_TABLE_NAME = process.env.LEAD_GENERATION_REPORT_TABLE_NAME;
 const DEVELOPER_WEEKLY_REPORT_TABLE_NAME = process.env.DEVELOPER_WEEKLY_REPORT_TABLE_NAME;
 
-//Save lead-generation report
-router.post("/lead-generation", (req, res) => {
-    const item = req.body;
+//Save developer-weekly report
+router.post("/job", async (req, res) => {
+    const {body} = req;
+    console.log(`Body: ${JSON.stringify(body, null, 4)}`);
 
-    item.id = uuidv4();
-    item.timestamp = Date.now();
-
+    let item = {
+        id: uuidv4(),
+        timestamp: Date.now(),
+        user: body.user,
+        week: body.week,
+        customer: body.customer,
+        hours: body.hours,
+        project: body.project,
+        date: body.date,
+        taskId: body.taskId,
+        boardId: body.boardId,
+        listId: body.listId
+    }
+    console.log(`Item: ${item}`);
     const params = {
-        TableName: LEAD_GENERATION_REPORT_TABLE_NAME,
+        TableName: DEVELOPER_WEEKLY_REPORT_TABLE_NAME,
         Item: item
     };
 
@@ -25,32 +36,36 @@ router.post("/lead-generation", (req, res) => {
         }
         res.json({response: "New report created"});
     });
+
 });
 
-//Save developer-weekly report
-router.post("/developer-weekly", async (req, res) => {
+//Get report for a week
+router.post("/week", async (req, res) => {
     const {body} = req;
     console.log(`Body: ${JSON.stringify(body, null, 4)}`);
 
-    if (body.tasks.length === 0) {
-        res.status(400).json({error: "Could not find the tasks"});
-    }
-    let params = {
-        RequestItems: {
-            [DEVELOPER_WEEKLY_REPORT_TABLE_NAME]: createItems(body)
-        }
+    const params = {
+        TableName: DEVELOPER_WEEKLY_REPORT_TABLE_NAME,
+        // Key: {
+        //     user: body.user,
+        //     week: body.week
+        // },
+        KeyConditionExpression: '#user = :user and #week = :week',
+        ExpressionAttributeNames: {"#user": "user", "#week": "week"},
+        ExpressionAttributeValues: {":user": body.user, ":week": body.week}
     };
 
-    console.log(`Params: ${params}`);
+    console.log(`Params: ${JSON.stringify(params, null, 4)}`);
 
-    await dynamoDb.batchWrite(params, (err, data) => {
+    dynamoDb.query(params, (err, data) => {
         if (err) {
             console.log(err);
             res.status(400).json({error: "Tasks is empty."});
         }
-        res.json({response: "New report created"});
+        res.json({week: data});
     });
 });
+
 
 let createItems = (item) => {
     console.log("Start createItems");

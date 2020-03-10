@@ -1,7 +1,8 @@
 const serverless = require("serverless-http");
 const bodyParser = require("body-parser");
 const express = require("express");
-const reports = require("./functions/reports");
+const leadGeneration = require("./functions/leadGeneration");
+const developer = require("./functions/developer");
 const trello = require("./functions/trello");
 const cors = require("cors");
 const fs = require('fs');
@@ -12,7 +13,8 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json({ strict: false }));
 
-app.use("/report", reports);
+app.use("/report/lead-generation", leadGeneration);
+app.use("/report/developer", developer);
 app.use("/trello", trello);
 
 app.get("/health", (req, res) => {

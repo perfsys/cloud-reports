@@ -6,6 +6,8 @@ import Vuelidate from "vuelidate";
 import Antd from 'ant-design-vue';
 import BootstrapVue from 'bootstrap-vue';
 import VueLogger from 'vuejs-logger';
+import axios from './axios'
+import VueAxios from 'vue-axios'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faPlus, faMinus, faCheck } from '@fortawesome/free-solid-svg-icons'
@@ -36,6 +38,7 @@ const options = {
 };
 
 Vue.use(VueLogger, options);
+Vue.use(VueAxios, axios)
 
 Vue.config.productionTip = false
 

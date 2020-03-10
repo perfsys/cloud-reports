@@ -4,7 +4,9 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "install": "npm install --prefix ./layer/nodejs",
+    "start": " sls offline start --printOutput",
+    "serve:ui": "npm run serve --prefix ./frontend",
+    "watch:ui": "nodemon --watch frontend -x 'npm run build --prefix ./frontend'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,16 +15,19 @@
     "aws-sdk": "^2.521.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
-    "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "path": "^0.12.7",
-    "serverless": "^1.61.1",
-    "serverless-http": "^2.3.0",
-    "trello-node-api": "0.0.7",
+    "serverless": "^1.66.0",
+    "serverless-http": "^2.3.2",
+    "trello-node-api": "^0.0.9",
     "uuid": "^3.3.3"
   },
   "devDependencies": {
-    "serverless-domain-manager": "^3.3.1"
+    "dotenv": "^8.1.0",
+    "nodemon": "^2.0.2",
+    "serverless-domain-manager": "^3.3.1",
+    "serverless-offline": "^6.0.0-alpha.67",
+    "serverless-dotenv-plugin": "^2.3.2"
   }
 }

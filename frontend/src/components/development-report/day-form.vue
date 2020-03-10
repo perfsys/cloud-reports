@@ -1,17 +1,13 @@
 <template>
     <div>
         <div>
-            <b-badge variant="primary" class="day-badge">{{ info.day }}</b-badge>
+            <b-badge variant="primary" class="day-badge">{{ day.date }}</b-badge>
             <div class="container-report-form">
-                <div class="container-report"
-                     v-for="(item, index) in dayReport"
-                     v-bind:key="index"
-                >
+                <div class="container-report">
                     <div class="position-input">
-                        <select
-                                class="form-control"
-                                v-model="dayReport[index].customer"
-                                :disabled="!dayReport[index].isInputsEnable"
+                        <select class="form-control"
+                                v-model="tmpJob.customer"
+                                @change="selectCustomer()"
                         >
                             <option disabled value>Select customer</option>
                             <option v-for="(customer, index) in customersDb"
@@ -24,31 +20,29 @@
                     <div class="position-input">
                         <select
                                 class="form-control"
-                                v-model="dayReport[index].project"
-                                @change="selectProject($event, index)"
-                                :disabled="!dayReport[index].isInputsEnable"
+                                v-model="tmpJob.project"
+                                @change="selectProject($event)"
+                                :disabled="!tmpJob.form.projectEnable"
                         >
                             <option disabled value>Select project</option>
                             <option
-                                    v-for="(project, project_index) in setProject(index)"
+                                    v-for="(project, project_index) in tmpJob.projectList"
                                     v-bind:key="project_index"
-                                    :value="project.id"
-                            >{{ project.name }}
-                            </option
-                            >
+                                    :value="project.id">{{ project.name }}
+                            </option>
                         </select>
                     </div>
 
                     <div class="position-input">
                         <select
                                 class="form-control"
-                                v-model="dayReport[index].task"
-                                @change="selectTask($event, index)"
-                                :disabled="!dayReport[index].isInputsEnable"
+                                v-model="tmpJob.task"
+                                @change="selectTask($event)"
+                                :disabled="!tmpJob.form.taskEnable"
                         >
                             <option disabled selected value="Select task">Select task</option>
                             <option
-                                    v-for="(task, task_index) in dayReport[index].trelloTasks"
+                                    v-for="(task, task_index) in tmpJob.trelloTasks"
                                     v-bind:key="task_index"
                                     :value="task">{{task.name}}
                             </option>
@@ -57,23 +51,18 @@
 
                     <div class="position-input">
                         <b-form-input
-                                v-model="dayReport[index].hours"
+                                v-model="tmpJob.hours"
                                 type="number"
                                 placeholder="Hours"
-                                :disabled="!dayReport[index].isInputsEnable">
+                                :disabled="!tmpJob.form.hoursEnable">
                         </b-form-input>
                     </div>
-                    <b-button variant="success" class="save-task-button" @click="emitToParent(index)">
+                    <b-button variant="success" class="save-task-button" @click="saveJob()"
+                              :disabled="tmpJob.hours <= 0">
                         <font-awesome-icon icon="check"/>
                     </b-button>
-                    <b-button variant="danger" class="remove-task-button" @click="removeTask(index)">
+                    <b-button variant="danger" class="remove-task-button" @click="initSaveForm()">
                         <font-awesome-icon icon="minus"/>
-                    </b-button>
-
-                </div>
-                <div>
-                    <b-button variant="success" class="add-task-button" @click="addTask">
-                        <font-awesome-icon icon="plus"/>
                     </b-button>
                 </div>
                 <br/>
@@ -83,91 +72,163 @@
 </template>
 
 <script>
-    import axios from "axios";
+    import Swal from "sweetalert2";
+
     import usersDb from "../../db/users.json";
     import customersDb from "../../db/customers.json";
 
     export default {
         name: "dayReport",
-        props: ["info", "API_ENDPOINT"],
+        props: ["day_info", "user", "week"],
         data: () => {
             return {
-                week: null,
-                report: null,
-                user: null,
-                numberWeek: null,
                 usersDb: usersDb,
                 customersDb: customersDb,
-                reportForm: {
-                    trelloTasks: [],
-                    isInputsEnable: true,
-                    customer: "",
-                    hours: ""
-                },
-                dayReport: [],
-                customerId: [],
-                taskArray: []
+                day: {},
+                user: null,
+                week: null,
+                tmpJob: {
+                    form: {
+                        taskEnable: false,
+                        projectEnable: false,
+                        hoursEnable: false,
+                    },
+                    customer: null,
+                    project: null,
+                    task: null,
+                    hours: 0
+                }
             };
         },
-        watch: {
-        },
-        mounted() {
-            this.dayReport.date = this.info;
+        async beforeMount() {
+            this.day = this.day_info;
+            await this.$store.dispatch('jobs/fetchJobs', {
+                user: this.user,
+                date: this.day.date
+            })
         },
         methods: {
-            emitToParent(index) {
-                this.dayReport[index].isInputsEnable = false
-                this.$emit("interface", this.dayReport);
-            },
+            saveJob() {
 
-            async selectProject(event, index) {
-                // let url = `${this.API_ENDPOINT}/trello/${event.target.value}`;
-                let url = `/trello/${event.target.value}`;
-                let result;
-                let me = this;
 
-                await axios
-                    .get(url)
-                    .then(response => {
-                        result = response.data.response;
-                        me.$log.info("result!!!!!!", result)
-                        me.dayReport[index].trelloTasks = result;
-                    })
-                    .catch(error => {
-                        me.$log.error(error)
-                        me.dayReport[index].trelloTasks = [];
+                if (this.user !== "") {
+
+                    let request = {
+                        user: this.user,
+                        week: this.week,
+
+
+                        date: this.day.date,
+                        customer: this.tmpJob.customer,
+                        project: this.tmpJob.projectName,
+                        hours: this.tmpJob.hours,
+
+                        taskId: this.tmpJob.task.id,
+                        boardId: this.tmpJob.task.idBoard,
+                        listId: this.tmpJob.task.idList
+                    };
+                    this.$log.info(this.request)
+                    this.axios
+                        .post(`/report/developer/job`, request)
+                        .then(() => {
+                            Swal.fire({
+                                position: 'top-end',
+                                title: 'The report was created',
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
+                        })
+                        .catch(error => {
+                            this.$log.error(error)
+                            Swal.fire({
+                                text: "Something went wrong!",
+                            });
+                        });
+
+                } else {
+                    Swal.fire({
+                        text: "Select user",
                     });
-
-            },
-            selectTask(event, index) {
+                }
                 // this.dayReport[index].taskId = event.target.value.id;
                 // this.dayReport[index].taskLink = event.target.value.url;
+                this.initSaveForm()
             },
-            addTask() {
-                this.dayReport.push(Object.assign({}, this.reportForm));
-            },
-            removeTask(taskIndex) {
-                this.dayReport.splice(taskIndex, 1);
-            },
-            setProject(index) {
-                let customerName = this.dayReport[index].customer || 0;
+            getProjectList() {
+                let customerName = this.tmpJob.customer;
                 let projects = {};
-                // let customerId;
                 let customerIdx = this.customersDb.findIndex(
                     el => el.name === `${customerName}`
                 );
 
                 if (customerIdx !== -1) {
                     let customer = this.customersDb[customerIdx];
-                    // customerId = customer.id;
                     projects = customer.projects;
                 }
+                return projects;
+            },
+            getProjectById(id) {
+                return  this.getProjectList().find(project => project.id === id);
+            },
+            selectCustomer() {
+                this.clearProjectsDropdown()
 
-                // if (customerId !== undefined) {
-                //     this.setTask(index, customerId);
-                // }
+                let projects = this.getProjectList();
+                this.initProjectsDropdown(projects)
 
-                return projects || 0;
+            },
+            selectProject(event) {
+                this.clearTasksDropdown()
+                let me = this;
+                let projectId = event.target.value;
+                let url = `/trello?id=${projectId}`;
+                this.tmpJob.projectName = this.getProjectById(projectId).name
+                this.axios.get(url)
+                    .then(response => {
+                        let result = response.data.response;
+                        me.$log.info("[getTrelloTasks] response", result)
+                        me.initTasksDropdown(result)
+                    })
+                    .catch(error => {
+                        me.$log.error(error)
+                        me.clearTasksDropdown()
+                    });
+            },
+            selectTask() {
+                this.initHoursInput()
+            },
+            initSaveForm() {
+                this.tmpJob.customer = null
+                this.clearProjectsDropdown()
+            },
+            initProjectsDropdown(projects) {
+                this.tmpJob.projectList = projects;
+                this.tmpJob.form.projectEnable = true
+            },
+            clearProjectsDropdown() {
+                this.tmpJob.projectList = [];
+                this.tmpJob.project = null
+                this.tmpJob.projectName = null
+                this.tmpJob.form.projectEnable = false
+                this.clearTasksDropdown()
+            },
+            initTasksDropdown(tasks) {
+                this.tmpJob.trelloTasks = tasks;
+                this.tmpJob.form.taskEnable = true
+            },
+            clearTasksDropdown() {
+                this.tmpJob.trelloTasks = [];
+                this.tmpJob.task = null
+                this.tmpJob.form.taskEnable = false
+                this.clearHoursInput()
+            },
+            initHoursInput() {
+                this.tmpJob.hours = 0
+                this.tmpJob.form.hoursEnable = true
+            },
+            clearHoursInput() {
+                this.tmpJob.hours = 0
+                this.tmpJob.form.hoursEnable = false
             }
         }
     };

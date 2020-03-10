@@ -4,7 +4,8 @@
             <div class="col-5 col-form-label">
                 <b-form-group id="input-group-3" label-for="input-3">
                     <div class="position-input">
-                        <select class="form-control" v-model="user">
+                        <select class="form-control" v-model="user"
+                                @change="selectUser()">
                             <option disabled value>Select user</option>
                             <option
                                     v-for="(user, index) in usersDb"
@@ -21,44 +22,32 @@
                 previous week({{ currentWeek - 1 }})
             </b-button>
             <span class="week__item-current">{{ firstDayOfWeek }} - {{ lastDayOfWeek }} (week {{ currentWeek }})</span>
-            <b-button class="week__item btn btn-light" :disabled="!isNextWeekPointerEnabled" @click="currentWeek++">next
-                week ({{ currentWeek + 1 }})
+            <b-button class="week__item btn btn-light" :disabled="!isNextWeekPointerEnabled" @click="currentWeek++">
+                next week ({{ currentWeek + 1 }})
             </b-button>
         </div>
-        <div>
+        <div v-if="weekEnable">
             <dayReport
                     v-for="(day, index) in fullWeek"
                     v-bind:key="index"
-                    :info="{ day: day, id: index }"
-                    :API_ENDPOINT="API_ENDPOINT"
-                    @interface="handleFcAfterDateBack">
+                    :day_info="{ date: day, id: index }"
+                    :user="user"
+                    :week="currentWeek"
+            >
             </dayReport>
-        </div>
-
-        <div class="bottom">
-            <b-button
-                    variant="primary"
-                    class="save-report-button"
-                    v-on:click="sendReport">
-                Send report
-            </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from "axios";
     import usersDb from "../../db/users.json";
     import dayForm from "./day-form.vue";
-    import Swal from "sweetalert2";
 
     export default {
         name: "report",
-        props: {
-            "API_ENDPOINT": String
-        },
         data: () => {
             return {
+                weekEnable: false,
                 week: null,
                 user: "",
                 numberWeek: null,
@@ -71,7 +60,7 @@
                 report: []
             };
         },
-        mounted() {
+        beforeMount() {
             this.currentWeek = this.getWeekNumber(new Date());
             this.startOfWeek();
         },
@@ -92,74 +81,20 @@
             }
         },
         methods: {
-            handleFcAfterDateBack(event) {
-                let result = [...event];
-
-                for (let i = 0; i < result.length; i++) {
-                    result[i].date = event.date.day;
-                }
-
-                this.report[event.date.id] = result;
-            },
-            sendReport() {
-                let report = [...this.report];
-
+            async selectUser(){
                 if (this.user !== "") {
-                    let tasks = report
-                        .flat()
-                        .filter(el => el !== undefined)
-                        .map(el => {
-                            el.taskId = el.task.id
-                            el.boardId = el.task.idBoard
-                            el.listId = el.task.idList
-                            delete el.trelloTasks
-                            delete el.isInputsEnable
-                            delete el.task
-                            return el
-                        });
-
-                    if (tasks.length > 0) {
-                        let request = {
-                            user: this.user,
-                            week: this.currentWeek,
-                            tasks: tasks
-                        };
-
-                        axios
-                            .post(`/report/developer-weekly`, request)
-                            .then(() => {
-                                Swal.fire({
-                                    position: 'top-end',
-                                    title: 'The report was created',
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                })
-                            })
-                            .catch(error => {
-                                this.$log.error(error)
-                                Swal.fire({
-                                    text: "Something went wrong!",
-                                });
-                            });
-                    } else {
-                        Swal.fire({
-                            text: "Could not sent empty report",
-                        });
-                    }
-                } else {
-                    Swal.fire({
-                        text: "Select user",
-                    });
+                    await this.$store.dispatch('fetchWeek', {
+                        user: this.user,
+                        week: this.currentWeek
+                    })
+                    this.weekEnable = true
                 }
-
             },
             getWeekNumber(d) {
                 d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
                 d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
                 let yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-                let weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-
-                return weekNo;
+                return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
             },
             setWeek() {
                 let year = new Date().getFullYear();
@@ -169,7 +104,7 @@
                 let firstDay = d1.getDay();
 
                 let days =
-                    firstDay == weekDay ?
+                    firstDay === weekDay ?
                         0 :
                         (weekNumber - 1) * 7 + weekDay - (firstDay - 1);
                 let dn = new Date(year, 0, days);
