@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import 'ant-design-vue/dist/antd.css';
+import 'vue-search-select/dist/VueSearchSelect.css'
 
 library.add(faPlus)
 library.add(faMinus)

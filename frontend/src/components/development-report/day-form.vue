@@ -49,20 +49,35 @@
                         </select>
                     </div>
 
-                    <div class="position-input">
-                        <select
-                                class="form-control"
-                                v-model="tmpJob.task"
-                                @change="selectTask($event)"
-                                :disabled="!tmpJob.form.taskEnable"
-                        >
-                            <option disabled selected value="Select task">Select task</option>
-                            <option
-                                    v-for="(task, task_index) in tmpJob.trelloTasks"
-                                    v-bind:key="task_index"
-                                    :value="task">{{task.name}}
-                            </option>
-                        </select>
+                    <div class="position-input task-dropdown">
+                        <!--                        <select-->
+                        <!--                                class="form-control"-->
+                        <!--                                v-model="tmpJob.task"-->
+                        <!--                                @change="selectTask($event)"-->
+                        <!--                                :disabled="!tmpJob.form.taskEnable"-->
+                        <!--                        >-->
+                        <!--                            <option disabled selected value="Select task">Select task</option>-->
+                        <!--                            <option-->
+                        <!--                                    v-for="(task, task_index) in tmpJob.trelloTasks"-->
+                        <!--                                    v-bind:key="task_index"-->
+                        <!--                                    :value="task">{{task.name}}-->
+                        <!--                            </option>-->
+                        <!--                        </select>-->
+                        <!--                        <Dropdown-->
+                        <!--                                :options="tmpJob.trelloTasks"-->
+                        <!--                                v-on:selected="selectTask($event)"-->
+                        <!--                                :disabled="!tmpJob.form.taskEnable"-->
+                        <!--                                name="zipcode"-->
+                        <!--                                :maxItem="15"-->
+                        <!--                                placeholder="Please select a task">-->
+                        <!--                        </Dropdown>-->
+                        <basic-select
+                                      :options="tmpJob.trelloTasks"
+                                      :selected-option="tmpJob.task"
+                                      @select="selectTask($event)"
+                                      placeholder="Please select a task"
+                                      :isDisabled="!tmpJob.form.taskEnable">
+                        </basic-select>
                     </div>
 
                     <div class="position-input">
@@ -89,12 +104,16 @@
 
 <script>
     import Swal from "sweetalert2";
+    import {BasicSelect} from 'vue-search-select'
 
     import usersDb from "../../db/users.json";
     import customersDb from "../../db/customers.json";
 
     export default {
         name: "dayReport",
+        components: {
+            BasicSelect
+        },
         props: ["dayInfo", "user", "week", "dailyReport"],
         data: () => {
             return {
@@ -111,6 +130,7 @@
                 // user: null,
                 // week: null,
                 tmpJob: {
+                    trelloTasks: [],
                     form: {
                         taskEnable: false,
                         projectEnable: false,
@@ -118,7 +138,10 @@
                     },
                     customer: null,
                     project: null,
-                    task: null,
+                    task: {
+                        text: '',
+                        value: ''
+                    },
                     hours: 0
                 }
             };
@@ -239,7 +262,8 @@
                         me.clearTasksDropdown()
                     });
             },
-            selectTask() {
+            selectTask(task) {
+                this.tmpJob.task = task
                 this.initHoursInput()
             },
             initSaveForm() {
@@ -258,12 +282,17 @@
                 this.clearTasksDropdown()
             },
             initTasksDropdown(tasks) {
-                this.tmpJob.trelloTasks = tasks;
+                let filtered = tasks.map(task => {
+                    task.text = task.name
+                    task.value = task.id
+                    return task
+                })
+                this.tmpJob.trelloTasks = filtered;
                 this.tmpJob.form.taskEnable = true
             },
             clearTasksDropdown() {
                 this.tmpJob.trelloTasks = [];
-                this.tmpJob.task = null
+                this.tmpJob.task = {text: '', value: ''}
                 this.tmpJob.form.taskEnable = false
                 this.clearHoursInput()
             },
@@ -342,5 +371,10 @@
         display: flex;
         margin-top: 50px;
         margin-left: 38%;
+    }
+
+    .task-dropdown > div.dropdown.disabled {
+        background-color: #e9ecef;
+        opacity: 1;
     }
 </style>
