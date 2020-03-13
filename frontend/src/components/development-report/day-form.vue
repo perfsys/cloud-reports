@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <b-badge variant="primary" class="day-badge">{{ dayInfo.date }}</b-badge>
+            <b-badge variant="primary" class="day-badge">{{ getBadge(dayInfo.date) }}</b-badge>
 
             <div class="container-report-form">
                 <b-table v-if="dailyReport && dailyReport.length > 0" striped hover :fields="fields"
@@ -51,11 +51,11 @@
 
                     <div class="position-input task-dropdown">
                         <basic-select
-                                      :options="tmpJob.trelloTasks"
-                                      :selected-option="tmpJob.task"
-                                      @select="selectTask($event)"
-                                      placeholder="Please select a task"
-                                      :isDisabled="!tmpJob.form.taskEnable">
+                                :options="tmpJob.trelloTasks"
+                                :selected-option="tmpJob.task"
+                                @select="selectTask($event)"
+                                placeholder="Please select a task"
+                                :isDisabled="!tmpJob.form.taskEnable">
                         </basic-select>
                     </div>
 
@@ -88,6 +88,14 @@
     import usersDb from "../../db/users.json";
     import customersDb from "../../db/customers.json";
 
+    let weekdays = new Array(7);
+    weekdays[0] = "Sunday";
+    weekdays[1] = "Monday";
+    weekdays[2] = "Tuesday";
+    weekdays[3] = "Wednesday";
+    weekdays[4] = "Thursday";
+    weekdays[5] = "Friday";
+    weekdays[6] = "Saturday";
     export default {
         name: "dayReport",
         components: {
@@ -96,6 +104,7 @@
         props: ["dayInfo", "user", "week", "dailyReport"],
         data: () => {
             return {
+                weekdays: ["Sunday", "Monday",  "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
                 fields: [
                     {key: 'customer', label: 'Customer'},
                     {key: 'project', label: 'Project'},
@@ -276,8 +285,11 @@
                 this.tmpJob.form.hoursEnable = false
             },
             openTrelloTask(url) {
-                console.log(url)
                 window.open(url, '_blank')
+            },
+            getBadge(date){
+                let dayNum = new Date(date).getDay()
+                return `${date} ${this.weekdays[dayNum]}`
             }
         }
     };
@@ -331,9 +343,8 @@
         vertical-align: baseline;
         border-radius: 0.25rem;
         height: 35px;
-        width: 150px;
         position: relative;
-        margin-bottom: 0px;
+        margin-bottom: 0;
         top: 15px;
         left: 22px;
     }
