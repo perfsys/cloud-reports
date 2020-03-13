@@ -64,7 +64,7 @@
         },
         beforeMount() {
             this.currentWeek = this.getWeekNumber(new Date());
-            this.startOfWeek();
+            this.initWeek();
         },
         computed: {
             isPreviousWeekPointerEnabled() {
@@ -120,31 +120,19 @@
                         (weekNumber - 1) * 7 + weekDay - (firstDay - 1);
                 let dn = new Date(year, 0, days);
 
-                let date = new Date(dn);
-                let i = 1;
-                let week = [];
-
-                for (i; i <= 6; i++) {
-                    let dayOfWeek =
-                        date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : i);
-                    week.push(new Date(date.setDate(dayOfWeek)).toLocaleDateString());
-                }
-                this.firstDayOfWeek = week[0];
-                this.lastDayOfWeek = week[5];
-                this.fullWeek = week;
+                this.initWeek(dn.toISOString().slice(0, 10))
             },
-            startOfWeek(date) {
-                date = new Date();
-                let i = 1;
-                let week = [];
+            initWeek(date) {
+                let curr = date ? new Date(date) : new Date()
+                let week = []
 
-                for (i; i <= 6; i++) {
-                    let dayOfWeek =
-                        date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : i);
-                    week.push(new Date(date.setDate(dayOfWeek)).toLocaleDateString());
+                for (let i = 1; i <= 7; i++) {
+                    let first = curr.getDate() - curr.getDay() + i
+                    let day = new Date(curr.setDate(first)).toISOString().slice(0, 10)
+                    week.push(day)
                 }
                 this.firstDayOfWeek = week[0];
-                this.lastDayOfWeek = week[5];
+                this.lastDayOfWeek = week[6];
                 this.fullWeek = week;
             }
         }

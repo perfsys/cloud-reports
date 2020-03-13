@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <b-badge variant="primary" class="day-badge">{{ day.date }}</b-badge>
+            <b-badge variant="primary" class="day-badge">{{ dayInfo.date }}</b-badge>
 
             <div class="container-report-form">
                 <b-table v-if="dailyReport && dailyReport.length > 0" striped hover :fields="fields"
@@ -50,27 +50,6 @@
                     </div>
 
                     <div class="position-input task-dropdown">
-                        <!--                        <select-->
-                        <!--                                class="form-control"-->
-                        <!--                                v-model="tmpJob.task"-->
-                        <!--                                @change="selectTask($event)"-->
-                        <!--                                :disabled="!tmpJob.form.taskEnable"-->
-                        <!--                        >-->
-                        <!--                            <option disabled selected value="Select task">Select task</option>-->
-                        <!--                            <option-->
-                        <!--                                    v-for="(task, task_index) in tmpJob.trelloTasks"-->
-                        <!--                                    v-bind:key="task_index"-->
-                        <!--                                    :value="task">{{task.name}}-->
-                        <!--                            </option>-->
-                        <!--                        </select>-->
-                        <!--                        <Dropdown-->
-                        <!--                                :options="tmpJob.trelloTasks"-->
-                        <!--                                v-on:selected="selectTask($event)"-->
-                        <!--                                :disabled="!tmpJob.form.taskEnable"-->
-                        <!--                                name="zipcode"-->
-                        <!--                                :maxItem="15"-->
-                        <!--                                placeholder="Please select a task">-->
-                        <!--                        </Dropdown>-->
                         <basic-select
                                       :options="tmpJob.trelloTasks"
                                       :selected-option="tmpJob.task"
@@ -126,9 +105,6 @@
                 ],
                 usersDb: usersDb,
                 customersDb: customersDb,
-                day: {},
-                // user: null,
-                // week: null,
                 tmpJob: {
                     trelloTasks: [],
                     form: {
@@ -146,14 +122,11 @@
                 }
             };
         },
-        async beforeMount() {
-            this.day = this.dayInfo;
-        },
         methods: {
             async fetchDay() {
                 await this.$store.dispatch('fetchDay', {
                     user: this.user,
-                    date: this.day.date
+                    date: this.dayInfo.date
                 })
             },
             saveJob() {
@@ -164,7 +137,7 @@
                         week: this.week,
 
 
-                        date: this.day.date,
+                        date: this.dayInfo.date,
                         customer: this.tmpJob.customer,
                         project: this.tmpJob.projectName,
                         hours: this.tmpJob.hours,
@@ -199,8 +172,6 @@
                         text: "Select user",
                     });
                 }
-                // this.dayReport[index].taskId = event.target.value.id;
-                // this.dayReport[index].taskLink = event.target.value.url;
                 this.initSaveForm()
             },
             deleteJob(id) {

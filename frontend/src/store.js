@@ -48,7 +48,8 @@ export default new Vuex.Store({
             const {data} = await Vue.axios.post('/report/developer/week', params)
             data.week
                 .map(job => {
-                    job.day = new Date(new Date(job.date).toLocaleDateString()).getDay();
+                    let day = new Date(job.date).getDay();
+                    if (day) job.day = day
                     return job
                 })
                 .forEach(job => commit('setJob', job))
@@ -60,7 +61,8 @@ export default new Vuex.Store({
             const {data} = await Vue.axios.post('/report/developer/day', params)
             data.day
                 .map(job => {
-                    job.day = new Date(new Date(job.date).toLocaleDateString()).getDay();
+                    let day = new Date(job.date).getDay();
+                    if (day) job.day = day
                     return job
                 })
                 .forEach(job => commit('setJob', job))
