@@ -47,7 +47,8 @@ export default new Vuex.Store({
 
         },
         async fetchDay({commit}, params) {
-            const day = new Date(new Date(params.date).toLocaleDateString()).getDay()
+
+            const day = new Date(params.date).getDay()
             commit('clearDay', day)
             const {data} = await Vue.axios.post('/report/developer/day', params)
             data.day
