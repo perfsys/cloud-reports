@@ -1,7 +1,7 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from 'vue';
+import Router from 'vue-router';
 import header from './components/header/header';
-import marketingReport from './components/marketing-report/marketing-report'
+import linkedInReport from './components/linked-in-report/linked-in-report';
 import developmentReport from './components/development-report/development-report';
 import test from './components/test';
 
@@ -14,7 +14,7 @@ const routes = [
         path: '/marketing',
         name: 'Marketing',
         components: {
-            default: marketingReport,
+            default: linkedInReport,
             header,
         }
     },

@@ -13,6 +13,7 @@ custom:
   region: ${opt:region, 'eu-west-1'}
   leadGenerationReportTable: ${self:service}-leadGenerationReport-${self:custom.stage}
   developerWeeklyReportTable: ${self:service}-developerWeeklyReport-${self:custom.stage}
+  linkedInReportsTableName: ${self:service}-linkedInReports-${self:custom.stage}
 
 provider:
   name: aws
@@ -26,9 +27,11 @@ provider:
       Resource:
         - { "Fn::GetAtt": ["leadGenerationReportTable", "Arn" ] }
         - { "Fn::GetAtt": ["developerWeeklyReportTable", "Arn" ] }
+        - { "Fn::GetAtt": ["linkedInReportsTable", "Arn" ] }
   environment:
     LEAD_GENERATION_REPORT_TABLE_NAME: ${self:custom.leadGenerationReportTable}
     DEVELOPER_WEEKLY_REPORT_TABLE_NAME: ${self:custom.developerWeeklyReportTable}
+    LINKED_IN_REPORTS_TABLE_NAME: ${self:custom.linkedInReportsTableName}
 
 package:
   exclude:
@@ -110,6 +113,23 @@ functions:
           method: GET
           cors: true
 
+  postLinkedInReport:
+    handler: index.handler
+    events:
+      - http:
+          path: '/reports/linked-in'
+          method: POST
+          cors: true
+
+
+  getLinkedInReports:
+    handler: index.handler
+    events:
+      - http:
+          path: '/reports/linked-in'
+          method: GET
+          cors: true
+
 resources:
   Resources:
     leadGenerationReportTable:
@@ -142,3 +162,16 @@ resources:
           - AttributeName: id
             KeyType: RANGE
 
+    linkedInReportsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.linkedInReportsTableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

@@ -4,6 +4,7 @@ const express = require("express");
 const leadGeneration = require("./functions/leadGeneration");
 const developer = require("./functions/developer");
 const trello = require("./functions/trello");
+const linkedInReportsRouter = require('./functions/linkedInReports');
 const cors = require("cors");
 const fs = require('fs');
 const path = require('path');
@@ -16,6 +17,7 @@ app.use(bodyParser.json({ strict: false }));
 app.use("/report/lead-generation", leadGeneration);
 app.use("/report/developer", developer);
 app.use("/trello", trello);
+app.use("/reports/linked-in", linkedInReportsRouter);
 
 app.get("/health", (req, res) => {
   res.send("HEALTHY");

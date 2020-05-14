@@ -59,6 +59,26 @@ export default new Vuex.Store({
                 })
                 .forEach(job => commit('setJob', job))
         },
+
+        postLinkedInStats: async (store, payload) => {
+            try {
+              const reqBody = {
+                data: payload,
+              };
+              const response = await Vue.axios.post('/reports/linked-in', reqBody);
+            } catch (err) {
+              console.log(err);
+            }
+          },
+          getLinkedInReports: async (store, payload) => {
+            try {
+              const { data: stats } = await Vue.axios.get('/reports/linked-in');
+
+              return stats;
+            } catch (err) {
+              console.log(err);
+            }
+          }
     },
     getters: {
         week: s => s.week
