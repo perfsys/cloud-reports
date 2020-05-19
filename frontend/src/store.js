@@ -65,9 +65,10 @@ export default new Vuex.Store({
               const reqBody = {
                 data: payload,
               };
-              const response = await Vue.axios.post('/reports/linked-in', reqBody);
+              await Vue.axios.post('/reports/linked-in', reqBody);
             } catch (err) {
               console.log(err);
+              throw err;
             }
           },
           getLinkedInReports: async (store, payload) => {
@@ -77,6 +78,7 @@ export default new Vuex.Store({
               return stats;
             } catch (err) {
               console.log(err);
+              throw err;
             }
           }
     },

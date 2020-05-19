@@ -1,6 +1,6 @@
 <template>
   <b-container fluid>
-    <b-form-group label="Profile" class="w-100 border-bottom border-primary">
+    <b-form-group label="Profile">
       <b-row>
         <b-col cols="3">
           <b-form-group label="Network Connections">
@@ -27,7 +27,11 @@
             <b-form-input type="number" v-model="stats.networkHashtags"/>
           </b-form-group>
         </b-col>
-
+      </b-row>
+    </b-form-group>
+    
+    <b-form-group label="Profile">
+      <b-row>
         <b-col cols="3">
           <b-form-group label="Last 90 days Views">
             <b-form-input type="number" v-model="stats.n90daysViews"/>
@@ -40,7 +44,9 @@
           </b-form-group>
         </b-col>
       </b-row>
+    </b-form-group>
 
+    <b-form-group label="Profile" class="w-100 border-bottom border-primary">
       <b-row>
         <b-col cols="3">
           <b-form-group label="Current SSI Index">
@@ -249,23 +255,33 @@
     }),
 
     async created() {
-      const stats = await this.$store.dispatch('getLinkedInReports');
+      try {
+        const stats = await this.$store.dispatch('getLinkedInReports');
 
-      if (stats.length) {
-        const payload = stats[0];
-        delete payload.id;
-        Object.assign(this.stats, payload);
+        if (stats.length) {
+          const payload = stats[0];
+          delete payload.id;
+          Object.assign(this.stats, payload);
+        }
+      } catch (err) {
+          alert('An error occurred. For more information, please, checkout the Dev. console.');
       }
     },
 
     methods: {
-      submit() {
-        const { stats } = this;
-        Object.keys(stats).forEach((key) => {
-          stats[key] = parseInt(stats[key], 10);
-        });
+      async submit() {
+        try {
+          const { stats } = this;
+          Object.keys(stats).forEach((key) => {
+            stats[key] = parseInt(stats[key], 10);
+          });
 
-        this.$store.dispatch('postLinkedInStats', stats);
+          await this.$store.dispatch('postLinkedInStats', stats);
+
+          alert('The report was successfully recorded.');
+        } catch(err) {
+          alert('An error occurred. For more information, please, checkout the Dev. console.');
+        }
       },
     },
   }
