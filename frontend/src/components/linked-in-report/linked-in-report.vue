@@ -259,7 +259,7 @@
         const stats = await this.$store.dispatch('getLinkedInReports');
 
         if (stats.length) {
-          const payload = stats[0];
+          const payload = {...stats[0]};
           delete payload.id;
           Object.assign(this.stats, payload);
         }

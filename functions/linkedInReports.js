@@ -45,6 +45,8 @@ router.get('/', async (request, response) => {
   try {
     const { Items: stats } = await scan({ TableName: process.env.LINKED_IN_REPORTS_TABLE_NAME });
 
+    stats.sort((val1, val2) => val1.id > val2.id ? -1 : 1);
+
     return response
       .status(200)
       .set({ 'Access-Control-Allow-Origin': '*' })
