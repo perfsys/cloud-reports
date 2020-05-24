@@ -21,8 +21,8 @@
                 route: '/development',
                 title: 'Development',
             }, {
-                route: '/marketing',
-                title: 'Marketing',
+                route: '/linked-in',
+                title: 'LinkedIn',
             }, {
                 route: '/lead-generation',
                 title: 'Lead Generation',

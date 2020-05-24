@@ -11,8 +11,8 @@ Vue.use(Router);
 const routes = [
     {path: '/', redirect: '/development'},
     {
-        path: '/marketing',
-        name: 'Marketing',
+        path: '/linked-in',
+        name: 'LinkedIn',
         components: {
             default: linkedInReport,
             header,

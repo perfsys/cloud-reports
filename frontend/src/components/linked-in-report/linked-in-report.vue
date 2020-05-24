@@ -280,7 +280,7 @@
 
           alert('The report was successfully recorded.');
         } catch(err) {
-          alert('An error occurred. For more information, please, checkout the Dev. console.');
+          alert('An error occurred. Please verify your inputs and try again.');
         }
       },
     },
