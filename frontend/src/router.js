@@ -1,7 +1,7 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from 'vue';
+import Router from 'vue-router';
 import header from './components/header/header';
-import marketingReport from './components/marketing-report/marketing-report'
+import linkedInReport from './components/linked-in-report/linked-in-report';
 import developmentReport from './components/development-report/development-report';
 import test from './components/test';
 
@@ -11,10 +11,10 @@ Vue.use(Router);
 const routes = [
     {path: '/', redirect: '/development'},
     {
-        path: '/marketing',
-        name: 'Marketing',
+        path: '/linked-in',
+        name: 'LinkedIn',
         components: {
-            default: marketingReport,
+            default: linkedInReport,
             header,
         }
     },

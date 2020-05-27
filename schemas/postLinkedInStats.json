@@ -1,0 +1,113 @@
+{
+  "description": "[POST /marketing/linked-in] validation schema",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "networkConnections": {
+          "type": "integer"
+        },
+        "networkGroups": {
+          "type": "integer"
+        },
+        "networkPages": {
+          "type": "integer"
+        },
+        "networkHashtags": {
+          "type": "integer"
+        },
+        "n90daysViews": {
+          "type": "integer"
+        },
+        "n7DaysSearch": {
+          "type": "integer"
+        },
+        "currentSSIIndex": {
+          "type": "integer"
+        },
+        "teamSSIRank": {
+          "type": "integer"
+        },
+        "teamSSIRankOfTotal": {
+          "type": "integer"
+        },
+        "industrySSIRankTopP": {
+          "type": "integer"
+        },
+        "g1Members": {
+          "type": "integer"
+        },
+        "g2Members": {
+          "type": "integer"
+        },
+        "g3Members": {
+          "type": "integer"
+        },
+        "company1PageFollowers": {
+          "type": "integer"
+        },
+        "company1UniqueVisitors30": {
+          "type": "integer"
+        },
+        "company1NewFollowers30": {
+          "type": "integer"
+        },
+        "company1PostImpressions30": {
+          "type": "integer"
+        },
+        "company1ButtonClicks30": {
+          "type": "integer"
+        },
+        "company2PageFollowers": {
+          "type": "integer"
+        },
+        "company2UniqueVisitors30": {
+          "type": "integer"
+        },
+        "company2NewFollowers30": {
+          "type": "integer"
+        },
+        "company2PostImpressions30": {
+          "type": "integer"
+        },
+        "company2ButtonClicks30": {
+          "type": "integer"
+        },
+        "company3PageFollowers": {
+          "type": "integer"
+        },
+        "company3UniqueVisitors30": {
+          "type": "integer"
+        },
+        "company3NewFollowers30": {
+          "type": "integer"
+        },
+        "company3PostImpressions30": {
+          "type": "integer"
+        },
+        "company3ButtonClicks30": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "networkConnections",
+        "networkGroups",
+        "networkPages",
+        "networkHashtags",
+        "n90daysViews",
+        "n7DaysSearch",
+        "currentSSIIndex",
+        "teamSSIRank",
+        "teamSSIRankOfTotal",
+        "industrySSIRankTopP",
+        "g1Members",
+        "g2Members",
+        "g3Members"
+      ]
+    }
+  },
+  "required": [
+    "data"
+  ]
+}
