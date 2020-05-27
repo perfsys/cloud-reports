@@ -25,7 +25,8 @@ router.post('/', async (request, response) => {
       body: { data: payload },
     } = request;
     const TableName = process.env.LINKED_IN_REPORTS_TABLE_NAME;
-    const Item = Object.assign({ id: Date.now().toString() }, payload);
+    const now = Date.now();
+    const Item = Object.assign({ id: now.toString(), createdAt: new Date(now).toISOString() }, payload);
 
     await put({ TableName, Item });
 
