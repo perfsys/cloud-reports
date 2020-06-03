@@ -5,6 +5,7 @@ const leadGeneration = require("./functions/leadGeneration");
 const developer = require("./functions/developer");
 const trello = require("./functions/trello");
 const linkedInReportsRouter = require('./functions/linkedInReports');
+const cronDataSerializer = require('./functions/cronDataSerializer');
 const cors = require("cors");
 const fs = require('fs');
 const path = require('path');
@@ -40,3 +41,4 @@ module.exports.handler = serverless(app, {
     req.context = event.requestContext;
   }
 });
+module.exports.cronDataSerializer = cronDataSerializer;

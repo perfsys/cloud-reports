@@ -1,4 +1,4 @@
-service: perfsys-cloud-reports
+service: ${self:custom.serviceName}
 
 plugins:
   - serverless-domain-manager
@@ -14,7 +14,10 @@ custom:
   leadGenerationReportTable: ${self:service}-leadGenerationReport-${self:custom.stage}
   developerWeeklyReportTable: ${self:service}-developerWeeklyReport-${self:custom.stage}
   linkedInReportsTableName: ${self:service}-linkedInReports-${self:custom.stage}
-
+  prefix: ${opt:prefix, 'perfsys'}
+  # prefix: ${opt:prefix, 'grobakidze'}
+  serviceName: ${self:custom.prefix}-cloud-reports
+  
 provider:
   name: aws
   runtime: nodejs10.x
@@ -25,13 +28,21 @@ provider:
       Action:
         - dynamodb:*
       Resource:
-        - { "Fn::GetAtt": ["leadGenerationReportTable", "Arn" ] }
-        - { "Fn::GetAtt": ["developerWeeklyReportTable", "Arn" ] }
-        - { "Fn::GetAtt": ["linkedInReportsTable", "Arn" ] }
+        - !GetAtt leadGenerationReportTable.Arn
+        - !GetAtt developerWeeklyReportTable.Arn
+        - !GetAtt linkedInReportsTable.Arn
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource:
+        - !Join ['', [!GetAtt TableDumpsBucket.Arn, /*]]
+
   environment:
     LEAD_GENERATION_REPORT_TABLE_NAME: ${self:custom.leadGenerationReportTable}
     DEVELOPER_WEEKLY_REPORT_TABLE_NAME: ${self:custom.developerWeeklyReportTable}
     LINKED_IN_REPORTS_TABLE_NAME: ${self:custom.linkedInReportsTableName}
+    TABLE_DUMPS_BUCKET_NAME: !Ref TableDumpsBucket
+    TABLES_TO_DUMP: ${self:custom.linkedInReportsTableName}
 
 package:
   exclude:
@@ -130,11 +141,16 @@ functions:
           method: GET
           cors: true
 
+  cronDataSerializer:
+    handler: index.cronDataSerializer
+    events:
+      - schedule: rate(24 hours)
+
 resources:
   Resources:
     leadGenerationReportTable:
       Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
+      # DeletionPolicy: Retain
       Properties:
         TableName: ${self:custom.leadGenerationReportTable}
         BillingMode: PAY_PER_REQUEST
@@ -147,7 +163,7 @@ resources:
 
     developerWeeklyReportTable:
       Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
+      # DeletionPolicy: Retain
       Properties:
         TableName: ${self:custom.developerWeeklyReportTable}
         BillingMode: PAY_PER_REQUEST
@@ -168,10 +184,17 @@ resources:
         TableName: ${self:custom.linkedInReportsTableName}
         AttributeDefinitions:
           - AttributeName: id
-            AttributeType: S
+            AttributeType: N
         KeySchema:
           - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
+    TableDumpsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.prefix}-cloud-reports-database-dumps
+        VersioningConfiguration:
+          Status: Enabled
