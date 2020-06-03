@@ -42,6 +42,7 @@ provider:
     DEVELOPER_WEEKLY_REPORT_TABLE_NAME: ${self:custom.developerWeeklyReportTable}
     LINKED_IN_REPORTS_TABLE_NAME: ${self:custom.linkedInReportsTableName}
     TABLE_DUMPS_BUCKET_NAME: !Ref TableDumpsBucket
+    TABLES_TO_DUMP: ${self:custom.linkedInReportsTableName}
 
 package:
   exclude:
@@ -143,7 +144,7 @@ functions:
   cronDataSerializer:
     handler: index.cronDataSerializer
     events:
-      - schedule: rate(8 hours)
+      - schedule: rate(24 hours)
 
 resources:
   Resources:
@@ -183,7 +184,7 @@ resources:
         TableName: ${self:custom.linkedInReportsTableName}
         AttributeDefinitions:
           - AttributeName: id
-            AttributeType: S
+            AttributeType: N
         KeySchema:
           - AttributeName: id
             KeyType: HASH
@@ -195,3 +196,5 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.prefix}-cloud-reports-database-dumps
+        VersioningConfiguration:
+          Status: Enabled
