@@ -30,6 +30,8 @@ const getStartOfTheUTCDayTimestamp = () => {
 const dumpTables = async (tables) => {
   const [ TableName, ...unprocessedTables ] = tables;
   const timestamp = getStartOfTheUTCDayTimestamp();
+  console.log('Scanning table - ', TableName);
+
   const { Items } = await scan({
     TableName,
     FilterExpression: 'id > :timestamp',
@@ -39,10 +41,11 @@ const dumpTables = async (tables) => {
   });
 
   Items.sort((a, b) => a.id < b.id ? 1 : - 1);
+  console.log('Items to serialization: ', JSON.stringify(Items));
 
-  const itemsToDump = [Items[0]];
-  const csvStr = await stringify(itemsToDump);
-  
+  const csvStr = await stringify([Items[0] || {}]);
+  console.log('Recording dataset to S3 /daily: ', csvStr);
+
   await putObject({
     Bucket: process.env.TABLE_DUMPS_BUCKET_NAME,
     Body: csvStr,
@@ -51,6 +54,7 @@ const dumpTables = async (tables) => {
 
   const dayOfTheWeek = new Date().getDay();
   if (dayOfTheWeek === 7) {
+    console.log('Recording dataset to S3 /weekly: ', csvStr);
     await putObject({
       Bucket: process.env.TABLE_DUMPS_BUCKET_NAME,
       Body: csvStr,
@@ -63,6 +67,7 @@ const dumpTables = async (tables) => {
 
 module.exports = async (event, context, callback) => {
   const tableNames = process.env.TABLES_TO_DUMP.split(',');
-  
+  console.log('Tables ready to be serialized: ', tableNames.join(', '));
+
   await dumpTables(tableNames);
 };
