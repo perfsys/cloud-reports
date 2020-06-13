@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const CSV = require('csv');
+const moment = require('moment');
 
 const DynamoDB = new AWS.DynamoDB.DocumentClient();
 const S3 = new AWS.S3();
@@ -16,20 +17,9 @@ const putObject = params => new Promise(
   (resolve, reject) => S3.putObject(params, (err, data) => err ? reject(err) : resolve(data))
 );
 
-const getStartOfTheUTCDayTimestamp = () => {
-  let timestamp = Date.now();
-
-  timestamp = new Date(timestamp).setHours(0);
-  timestamp = new Date(timestamp).setMinutes(0);
-  timestamp = new Date(timestamp).setSeconds(0);
-  timestamp = new Date(timestamp).setMilliseconds(0);
-
-  return timestamp;
-};
-
 const dumpTables = async (tables) => {
   const [ TableName, ...unprocessedTables ] = tables;
-  const timestamp = getStartOfTheUTCDayTimestamp();
+  const timestamp = moment().startOf('week').unix() * 1000;
   console.log('Scanning table - ', TableName);
 
   const { Items } = await scan({
@@ -44,29 +34,19 @@ const dumpTables = async (tables) => {
   console.log('Items to serialization: ', JSON.stringify(Items));
 
   const csvStr = await stringify([Items[0] || {}]);
-  console.log('Recording dataset to S3 /daily: ', csvStr);
+  console.log('Recording dataset to S3: ', csvStr);
 
   await putObject({
-    Bucket: process.env.TABLE_DUMPS_BUCKET_NAME,
+    Bucket: process.env.LINKED_IN_REPORTS_WEEKLY_BUCKET_NAME,
     Body: csvStr,
-    Key: `daily/${TableName}-latest.csv`,
+    Key: `latest.csv`,
   });
-
-  const dayOfTheWeek = new Date().getDay();
-  if (dayOfTheWeek === 7) {
-    console.log('Recording dataset to S3 /weekly: ', csvStr);
-    await putObject({
-      Bucket: process.env.TABLE_DUMPS_BUCKET_NAME,
-      Body: csvStr,
-      Key: `weekly/${TableName}-latest.csv`,
-    });
-  }
 
   if (unprocessedTables.length) return dumpTables(unprocessedTables);
 };
 
-module.exports = async (event, context, callback) => {
-  const tableNames = process.env.TABLES_TO_DUMP.split(',');
+module.exports = async () => {
+  const tableNames = [process.env.LINKED_IN_REPORTS_TABLE_NAME];
   console.log('Tables ready to be serialized: ', tableNames.join(', '));
 
   await dumpTables(tableNames);

@@ -14,9 +14,7 @@ custom:
   leadGenerationReportTable: ${self:service}-leadGenerationReport-${self:custom.stage}
   developerWeeklyReportTable: ${self:service}-developerWeeklyReport-${self:custom.stage}
   linkedInReportsTableName: ${self:service}-linkedInReports-${self:custom.stage}
-  prefix: ${opt:prefix, 'perfsys'}
-  # prefix: ${opt:prefix, 'grobakidze'}
-  serviceName: ${self:custom.prefix}-cloud-reports
+  serviceName: perfsys-cloud-reports-${self:custom.stage}
   
 provider:
   name: aws
@@ -41,8 +39,7 @@ provider:
     LEAD_GENERATION_REPORT_TABLE_NAME: ${self:custom.leadGenerationReportTable}
     DEVELOPER_WEEKLY_REPORT_TABLE_NAME: ${self:custom.developerWeeklyReportTable}
     LINKED_IN_REPORTS_TABLE_NAME: ${self:custom.linkedInReportsTableName}
-    TABLE_DUMPS_BUCKET_NAME: !Ref TableDumpsBucket
-    TABLES_TO_DUMP: ${self:custom.linkedInReportsTableName}
+    LINKED_IN_REPORTS_WEEKLY_BUCKET_NAME: !Ref TableDumpsBucket
 
 package:
   exclude:
@@ -141,10 +138,10 @@ functions:
           method: GET
           cors: true
 
-  cronDataSerializer:
-    handler: index.cronDataSerializer
+  linkedInWeeklyCsvExport:
+    handler: index.linkedInWeeklyCsvExport
     events:
-      - schedule: rate(24 hours)
+      - schedule: cron(0 21 ? * FRI *)
 
 resources:
   Resources:
@@ -195,6 +192,6 @@ resources:
     TableDumpsBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.prefix}-cloud-reports-database-dumps
+        BucketName: cloud-reports-linkedin-weekly-csv-${self:custom.stage}
         VersioningConfiguration:
           Status: Enabled
