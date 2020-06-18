@@ -14,7 +14,7 @@ custom:
   leadGenerationReportTable: ${self:service}-leadGenerationReport-${self:custom.stage}
   developerWeeklyReportTable: ${self:service}-developerWeeklyReport-${self:custom.stage}
   linkedInReportsTableName: ${self:service}-linkedInReports-${self:custom.stage}
-  serviceName: perfsys-cloud-reports-${self:custom.stage}
+  serviceName: perfsys-cloud-reports
   
 provider:
   name: aws
@@ -138,10 +138,10 @@ functions:
           method: GET
           cors: true
 
-  linkedInWeeklyCsvExport:
+  databaseCsvExport:
     handler: index.linkedInWeeklyCsvExport
     events:
-      - schedule: cron(0 21 ? * FRI *)
+      - schedule: rate(2 hours)
 
 resources:
   Resources:
@@ -181,7 +181,7 @@ resources:
         TableName: ${self:custom.linkedInReportsTableName}
         AttributeDefinitions:
           - AttributeName: id
-            AttributeType: N
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
